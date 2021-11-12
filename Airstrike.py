@@ -55,7 +55,7 @@ def get_hit_coords(everything_list):
         if item[7] in checked:  # If the object ID HAS been checked already...do nothing
             pass
         else:   # Otherwise add the x and y coordinates as a tuple to "target_list" and add the id to "checked"
-            target_list.append((item[7], item[5], item[6]))
+            target_list.append([item[7], item[5], item[6]])
             checked.append(item[7])
     
     return(target_list)
@@ -78,7 +78,7 @@ def drone_recon():
     if len(data) != 0: 
         all_targets += data  # concatonates all data to all_targets (replacement for flattening)
         for row in all_targets:
-            if (row[0] == 'base') or (row[0] == 'SAM'):     #! Change this line to change what the bomber drone bombs
+            if (row[0] == 'base'):     #! Change this line to change what the bomber drone bombs
                 targets_to_hit.append(row)
     else:   # Don't do anything with an empty list
         pass
@@ -108,36 +108,41 @@ def drone_recon():
 kill_it = list()
 hit_ids = list()
 
+#! This bwoken...
 def drone_bomber():
     # In order to kill something, "set_destination(x, y)" and "deploy_air_to_ground(x, y)" should be used together
     #! Bomber has 100 pixel radius
     global all_targets, kill_it, hit_ids, targets_to_hit
     
+    kill_it = get_hit_coords(targets_to_hit)    # Makes "kill_it" the list of targets to hit
+    
     if bomb:
-        kill_it = get_hit_coords(targets_to_hit)    # Makes "kill_it" the list of targets to hit
                 
         for item in kill_it:
     
-            id, x, y = item[0], item[1], item[2]    # Parse the tuples into the obejct's id, x, and y coordinates
+            id = item[0]
+            x = item[1]
+            y = item[2]
             
             # !!! FIXME:
             # print("kill_it:", kill_it)
             # print("hit_ids", hit_ids)
-            # print("Bombs left:", get_bomb_inventory())
-            
-            if id not in hit_ids:
+            print("Item:", item)
+            print("Intel:", intel_report())
+            print("Bombs left:", get_bomb_inventory())
 
-                #! This can all be optimized later
+            #! This can all be optimized later
+            if id not in hit_ids and destination_reached():
                 set_destination(x, y)   # Set the bomber's destination to the location of the object
                 deploy_air_to_ground(x, y)  # KILL IT
                 hit_ids.append(id)  # Add the obejct id to "hit_ids"
+            else:
+                set_destination(x, y)
 
-            elif id in hit_ids:
-                set_destination(299, 100)   # (299, 100) will act like the bomber drone's "safe" zone -> this can cange to wherever
-        
         #! Terminating Conidition:
         if len(hit_ids) == len(kill_it):
-            mission_complete()      # Mission complete when all of the items have been hit
+            pass
+            # mission_complete()      # Mission complete when all of the items have been hit
 
     else:
         pass
