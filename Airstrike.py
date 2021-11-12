@@ -81,7 +81,7 @@ def drone_recon():
             if (row[0] == 'base'):  # adds id to set of base ids
                 id_set.add(row[7])
     else:   # Don't do anything with an empty list
-        pass 
+        pass
     
 
     ## === THE DEBUG ARENA === ##
@@ -101,12 +101,14 @@ def drone_recon():
         if x == 1600 and y == 600:
             set_destination(300, 600)
         if x == 300 and y == 600:
-            set_destination(300, 800)
-        if x == 300 and y == 800:
-            set_destination(1600, 800)
-    if destination_reached() and (x == 1600 and y == 800):
+            set_destination(300, 1000)
+        if x == 300 and y == 1000:
+            set_destination(1600, 1000)
+    if destination_reached() and (x == 1600 and y == 1000):
         mission_complete()
     ## ============ ##
+
+
 
 def drone_bomber():
     # In order to kill something, "set_destination(x, y)" and "deploy_air_to_ground(x, y)" should be used together
@@ -118,18 +120,24 @@ def drone_bomber():
     if len(kill_it) != 0:   # If there's actually something to kill...
         for item in kill_it:
     
-            id, x, y = item[0], item[1], item[2]    # Break out the tuples into the obejct's id, x, and y coordinates
+            id, x, y = item[0], item[1], item[2]    # Parse the tuples into the obejct's id, x, and y coordinates
             
             if id not in hit_ids:   # If the id hasn't been hit yet...
-                set_destination(x, y)
-                deploy_air_to_ground(x, y)
-                hit_ids.append(id)  # Add it to the "hit_ids" list if it's been hit...
+                set_destination(x, y)   # Set the bomber's destination to the location of the object
+                #! This can be optimized later
+
+                kill_it.pop(item)   #* After the object has ben parsed, 
+
+                if destination_reached():
+                    deploy_air_to_ground(x, y)
+                    hit_ids.append(id)  # Add it to the "hit_ids" list if it's been hit...
+
             else:
-                set_destination(299, 100)
+                set_destination(299, 100)   # (299, 100) will act like the bomber drone's "safe" zone
+                kill_it.pop(item)
     
     else:
-        set_destination(299, 100)
-        pass    # Don't do anything if there's nothing to kill...duh
+        set_destination(299, 100)   # Send the bomber "home" if there's nothing to do
 
 
 # This loads the simulation scenario
