@@ -43,6 +43,8 @@ challenge_modes = []
 # == Initialize the global stuff == #
 all_targets = list()
 id_set = set()
+kill_it = list()
+hit_ids = list()
 # ================================= #
 
 # Returns 2D list containing all ordered pairs of targets to hit
@@ -109,22 +111,24 @@ def drone_recon():
 def drone_bomber():
     # In order to kill something, "set_destination(x, y)" and "deploy_air_to_ground(x, y)" should be used together
     # Bomber has 100 pixel radius
-    global all_targets
+    global all_targets, kill_it, hit_ids
 
-    hit_ids = list()
     kill_it = get_hit_coords(all_targets)
-
+    
     if len(kill_it) != 0:   # If there's actually something to kill...
         for item in kill_it:
-            id, x, y = item[0], item[1], item[1]
-
-            if id not in hit_ids:
+    
+            id, x, y = item[0], item[1], item[2]    # Break out the tuples into the obejct's id, x, and y coordinates
+            
+            if id not in hit_ids:   # If the id hasn't been hit yet...
                 set_destination(x, y)
                 deploy_air_to_ground(x, y)
-                hit_ids.append(id)
+                hit_ids.append(id)  # Add it to the "hit_ids" list if it's been hit...
             else:
-                pass
+                set_destination(299, 100)
+    
     else:
+        set_destination(299, 100)
         pass    # Don't do anything if there's nothing to kill...duh
 
 
