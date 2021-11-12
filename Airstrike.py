@@ -31,10 +31,10 @@ from drone_api import get_drone_health
 
 
 # MAP_SEED = "two"
-#MAP_SEED = "three"
+MAP_SEED = "three"
 # MAP_SEED = "five"
 # MAP_SEED = "SAM-protected"
-MAP_SEED = "test range"
+# MAP_SEED = "test range"
 
 # 1-min scans, 2-min bomber dmg, 3-varying bomb damage, 4-Advanced SAMs, 5-limited bomb capacity
 # include desired mode numbers in list variable below
@@ -42,9 +42,8 @@ challenge_modes = []
 
 # == Initialize the global stuff == #
 all_targets = list()
-id_set = set()
-kill_it = list()
-hit_ids = list()
+targets_to_hit = list()
+bomb = bool()
 # ================================= #
 
 # Returns 2D list containing all ordered pairs of targets to hit
@@ -64,7 +63,8 @@ def get_hit_coords(everything_list):
 
 def drone_recon():
     global all_targets
-    global id_set
+    global targets_to_hit
+    global bomb
 
     ignore_drone_damage()
     engage_plaidspeed()
@@ -78,8 +78,8 @@ def drone_recon():
     if len(data) != 0: 
         all_targets += data  # concatonates all data to all_targets (replacement for flattening)
         for row in all_targets:
-            if (row[0] == 'base'):  # adds id to set of base ids
-                id_set.add(row[7])
+            if (row[0] == 'base') or (row[0] == 'SAM'):     #! Change this line to change what the bomber drone bombs
+                targets_to_hit.append(row)
     else:   # Don't do anything with an empty list
         pass
     
@@ -105,40 +105,47 @@ def drone_recon():
         if x == 300 and y == 1000:
             set_destination(1600, 1000)
     if destination_reached() and (x == 1600 and y == 1000):
-        mission_complete()
+        #mission_complete()
+        print("This is where we'd normally finish.")
+        bomb = True
     ## ============ ##
 
+## Globals for Drone Bomber ##
+kill_it = list()
+hit_ids = list()
 
 
 def drone_bomber():
     # In order to kill something, "set_destination(x, y)" and "deploy_air_to_ground(x, y)" should be used together
     # Bomber has 100 pixel radius
-    global all_targets, kill_it, hit_ids
-
-    kill_it = get_hit_coords(all_targets)
+    global all_targets, kill_it, hit_ids, targets_to_hit
     
-    if len(kill_it) != 0:   # If there's actually something to kill...
+    if bomb:
+        kill_it = get_hit_coords(targets_to_hit)
+                
         for item in kill_it:
     
             id, x, y = item[0], item[1], item[2]    # Parse the tuples into the obejct's id, x, and y coordinates
             
+            #!!! FIXME
+            print("kill_it:", kill_it)
+            print("hit_ids", hit_ids)
+            print("Bombs left:", get_bomb_inventory())
+            
             if id not in hit_ids:   # If the id hasn't been hit yet...
+                #! This can all be optimized later
                 set_destination(x, y)   # Set the bomber's destination to the location of the object
-                #! This can be optimized later
+                deploy_air_to_ground(x, y)
+                hit_ids.append(id)  # Add it to the "hit_ids" list once it's been hit...
 
-                kill_it.pop(item)   #* After the object has ben parsed, 
-
-                if destination_reached():
-                    deploy_air_to_ground(x, y)
-                    hit_ids.append(id)  # Add it to the "hit_ids" list if it's been hit...
-
-            else:
+            elif id in hit_ids:
                 set_destination(299, 100)   # (299, 100) will act like the bomber drone's "safe" zone
-                kill_it.pop(item)
-    
-    else:
-        set_destination(299, 100)   # Send the bomber "home" if there's nothing to do
+        
+        if len(hit_ids) == len(kill_it):
+            mission_complete()
 
+    else:
+        print("Not time yet.")
 
 # This loads the simulation scenario
 # DO NOT TOUCH
