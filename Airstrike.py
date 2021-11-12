@@ -124,7 +124,6 @@ def drone_bomber():
                 hit_ids.append(id)
             else:
                 pass
-
     else:
         pass    # Don't do anything if there's nothing to kill...duh
 
