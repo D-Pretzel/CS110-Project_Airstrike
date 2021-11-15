@@ -108,7 +108,6 @@ def drone_recon():
 kill_it = list()
 hit_ids = list()
 
-#! This bwoken...
 def drone_bomber():
     # In order to kill something, "set_destination(x, y)" and "deploy_air_to_ground(x, y)" should be used together
     #! Bomber has 100 pixel radius
