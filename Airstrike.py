@@ -43,7 +43,7 @@ challenge_modes = []
 # == Initialize the global stuff == #
 all_targets = list()
 targets_to_hit = list()
-bomb = bool()
+bomb = bool()   # Trigger to tell bomber drone to go
 # ================================= #
 
 # Returns 2D list containing all ordered pairs of targets to hit
@@ -55,7 +55,7 @@ def get_hit_coords(targets):
         if item[7] in checked:  # If the object ID HAS been checked already...do nothing
             pass
         else:   # Otherwise add the x and y coordinates as a tuple to "target_list" and add the id to "checked"
-            target_list.append([item[7], item[5], item[6]])
+            target_list.append([item[7], item[5], item[6]]) # Append in the form ["id", x, y]
             checked.append(item[7])
     
     return(target_list)
