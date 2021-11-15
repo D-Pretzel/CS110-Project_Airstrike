@@ -114,23 +114,26 @@ kill_it = list()
 def drone_bomber():
     # In order to kill something, "set_destination(x, y)" and "deploy_air_to_ground(x, y)" should be used together
     #! Bomber has 100 pixel radius
+
     global all_targets, kill_it, targets_to_hit
 
     kill_it = get_hit_coords(targets_to_hit)
 
-    x = get_x_location()
-    y = get_y_location()
+    bomb_x = get_x_location()
+    bomb_y = get_y_location()
+
+    if bomb and taking_off():
+        base = kill_it.pop(0)
+        set_destination(base[1], base[2])
 
     if bomb and destination_reached():
-        
-        base = kill_it.pop(0)
-        # base = ["id", x, y]
-
-        set_destination(base[1], base[2])
         deploy_air_to_ground(base[1], base[2])
-        
-        if len(kill_it) == 0:   # Completion case
-            mission_complete()
+
+        new_base = kill_it.pop(0)
+        set_destination(new_base[1], new_base[2])
+
+    if bomb and destination_reached() and (len(kill_it) == 0):   # Completion case
+        mission_complete()
 
 
 # This loads the simulation scenario
