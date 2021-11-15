@@ -110,35 +110,27 @@ def drone_recon():
 
 ## Globals for Drone Bomber ##
 kill_it = list()
-hit_ids = list()
 
 def drone_bomber():
     # In order to kill something, "set_destination(x, y)" and "deploy_air_to_ground(x, y)" should be used together
     #! Bomber has 100 pixel radius
-    global all_targets, kill_it, hit_ids, targets_to_hit
+    global all_targets, kill_it, targets_to_hit
 
     kill_it = get_hit_coords(targets_to_hit)
 
     x = get_x_location()
     y = get_y_location()
 
-    if bomb:
+    if bomb and destination_reached():
         
         base = kill_it.pop(0)
         # base = ["id", x, y]
 
-        if base[0] not in hit_ids:
-            set_destination(base[1], base[2])
-            deploy_air_to_ground(base[1], base[2])
-            print("base:", base)
-            hit_ids.append(base[0])
-            
-        else:
-            pass
-                
+        set_destination(base[1], base[2])
+        deploy_air_to_ground(base[1], base[2])
+        
         if len(kill_it) == 0:   # Completion case
             mission_complete()
-        
 
 
 # This loads the simulation scenario
