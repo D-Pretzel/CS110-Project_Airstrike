@@ -2,7 +2,7 @@
 # Author(s): C4C Petzold & C4C Cho
 # Course: CS110, Fall 2021
 # Final Turn-in Options: 
-# DOCUMENTATION: 
+# DOCUMENTATION: C/4C Anderson assisted in logic surrounding drone_bomber bombing behavior
 
 ## ======================== ##
 #   Gate Check Requirements   #
@@ -47,11 +47,11 @@ bomb = bool()
 # ================================= #
 
 # Returns 2D list containing all ordered pairs of targets to hit
-def get_hit_coords(everything_list):
+def get_hit_coords(targets):
     target_list = list()
     checked = list()
 
-    for item in everything_list:
+    for item in targets:
         if item[7] in checked:  # If the object ID HAS been checked already...do nothing
             pass
         else:   # Otherwise add the x and y coordinates as a tuple to "target_list" and add the id to "checked"
@@ -65,6 +65,7 @@ def drone_recon():
     global all_targets
     global targets_to_hit
     global bomb
+    global kill_it
 
     ignore_drone_damage()
     engage_plaidspeed()
@@ -84,8 +85,10 @@ def drone_recon():
         pass
  
     ## DRONE MOVES ##
+
     if taking_off():
         set_destination(300, 200)
+
     if destination_reached():
         if x == 300 and y == 200:
             set_destination(1600, 200)
@@ -97,10 +100,11 @@ def drone_recon():
             set_destination(300, 1000)
         if x == 300 and y == 1000:
             set_destination(1600, 1000)
+
     if destination_reached() and (x == 1600 and y == 1000):
-        #mission_complete()
-        print("This is where we'd normally finish.")
+        print("Done scanning!")
         bomb = True
+
     ## ============ ##
 
 
@@ -112,39 +116,30 @@ def drone_bomber():
     # In order to kill something, "set_destination(x, y)" and "deploy_air_to_ground(x, y)" should be used together
     #! Bomber has 100 pixel radius
     global all_targets, kill_it, hit_ids, targets_to_hit
-    
-    kill_it = get_hit_coords(targets_to_hit)    # Makes "kill_it" the list of targets to hit
-    
+
+    kill_it = get_hit_coords(targets_to_hit)
+
+    x = get_x_location()
+    y = get_y_location()
+
     if bomb:
-                
-        for item in kill_it:
-    
-            id = item[0]
-            x = item[1]
-            y = item[2]
+        
+        base = kill_it.pop(0)
+        # base = ["id", x, y]
+
+        if base[0] not in hit_ids:
+            set_destination(base[1], base[2])
+            deploy_air_to_ground(base[1], base[2])
+            print("base:", base)
+            hit_ids.append(base[0])
             
-            # !!! FIXME:
-            # print("kill_it:", kill_it)
-            # print("hit_ids", hit_ids)
-            print("Item:", item)
-            print("Intel:", intel_report())
-            print("Bombs left:", get_bomb_inventory())
-
-            #! This can all be optimized later
-            if id not in hit_ids and destination_reached():
-                set_destination(x, y)   # Set the bomber's destination to the location of the object
-                deploy_air_to_ground(x, y)  # KILL IT
-                hit_ids.append(id)  # Add the obejct id to "hit_ids"
-            else:
-                set_destination(x, y)
-
-        #! Terminating Conidition:
-        if len(hit_ids) == len(kill_it):
+        else:
             pass
-            # mission_complete()      # Mission complete when all of the items have been hit
+                
+        if len(kill_it) == 0:   # Completion case
+            mission_complete()
+        
 
-    else:
-        pass
 
 # This loads the simulation scenario
 # DO NOT TOUCH
