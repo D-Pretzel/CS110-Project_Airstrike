@@ -114,6 +114,7 @@ def drone_bomber():
     # In order to kill something, "set_destination(x, y)" and "deploy_air_to_ground(x, y)" should be used together
     # "deploy_air_to_ground(x, y)" is instantaneous
     #! Bomber has 100 pixel radius
+    
     global kill_it, targets_to_hit
 
     kill_it = get_hit_coords(targets_to_hit)
