@@ -55,7 +55,7 @@ def get_hit_coords(targets):
         if item[7] in checked:  # If the object ID HAS been checked already...do nothing
             pass
         else:   # Otherwise add the x and y coordinates as a tuple to "target_list" and add the id to "checked"
-            target_list.append([item[7], item[5], item[6]]) # Append in the form ["id", x, y]
+            target_list.append([item[5], item[6]]) # Append in the form [x, y]
             checked.append(item[7])
     
     return(target_list)
@@ -102,7 +102,6 @@ def drone_recon():
             set_destination(1600, 1000)
 
     if destination_reached() and (x == 1600 and y == 1000):
-        print("Done scanning!")
         bomb = True
 
     ## ============ ##
@@ -113,28 +112,45 @@ kill_it = list()
 
 def drone_bomber():
     # In order to kill something, "set_destination(x, y)" and "deploy_air_to_ground(x, y)" should be used together
+    # "deploy_air_to_ground(x, y)" is instantaneous
     #! Bomber has 100 pixel radius
-
-    global all_targets, kill_it, targets_to_hit
+    global kill_it, targets_to_hit
 
     kill_it = get_hit_coords(targets_to_hit)
 
-    bomb_x = get_x_location()
-    bomb_y = get_y_location()
+    bomber_x = get_x_location()
+    bomber_y = get_y_location()
 
-    if bomb and taking_off():
-        base = kill_it.pop(0)
-        set_destination(base[1], base[2])
+    if len(kill_it) != 0:
+        set_destination(kill_it[0][0], kill_it[0][1])
+        
+        if destination_reached() and bomber_x == kill_it[0][0] and bomber_y == kill_it[0][1]:
+            deploy_air_to_ground(kill_it[0][0], kill_it[0][1])
+            print("BOOM")
+            mission_complete()
 
-    if bomb and destination_reached():
-        deploy_air_to_ground(base[1], base[2])
 
-        new_base = kill_it.pop(0)
-        set_destination(new_base[1], new_base[2])
+    ### STUFF BLOW HERE IS A WORK IN PROGRESS ###
 
-    if bomb and destination_reached() and (len(kill_it) == 0):   # Completion case
-        mission_complete()
+    # 
+    # kill_it = get_hit_coords(targets_to_hit)
+# 
+    # bomber_x = get_x_location()
+    # bomber_y = get_y_location()
 
+    # This statement is guaranteed to be entered once
+    # if bomb and taking_off():
+# 
+        #!FIXME
+        # print("Bomber taking off")
+        # set_destination(299, 500)
+
+    # This statement is guaranteed to be entered once
+    # if bomb and destination_reached():    # Initial "fake" destination
+    # 
+    # if bomb and len(kill_it) == 0:
+        # mission_complete()
+    
 
 # This loads the simulation scenario
 # DO NOT TOUCH
