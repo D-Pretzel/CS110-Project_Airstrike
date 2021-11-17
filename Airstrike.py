@@ -111,10 +111,9 @@ def drone_recon():
 kill_it = list()
 
 def drone_bomber():
-    # In order to kill something, "set_destination(x, y)" and "deploy_air_to_ground(x, y)" should be used together
     # "deploy_air_to_ground(x, y)" is instantaneous
     #! Bomber has 100 pixel radius
-    
+
     global kill_it, targets_to_hit
 
     kill_it = get_hit_coords(targets_to_hit)
@@ -122,35 +121,24 @@ def drone_bomber():
     bomber_x = get_x_location()
     bomber_y = get_y_location()
 
-    if len(kill_it) != 0:
-        set_destination(kill_it[0][0], kill_it[0][1])
+    # Will only enter this part if the recon drone is done scanning
+    if bomb:
+
+        if taking_off():    # Will enter one time -> on bomber drone's taking off
+            set_destination(100, 500)   # This is the bomber's "home"
+
+        if destination_reached():   # If the bomber drone has gotten where it's supposed to go
+
+            if bomber_x == 100 and bomber_y == 500:     # If the bomber is at "home"...
+                base = kill_it.pop(0)   # Pop the next base
+                set_destination(base[0], base[1])   # Make its destination the first base's x and y
+
+            if bomber_x != 100 and bomber_y != 500:     # If the bomber has reached its destination anywhere other than (100, 500)
+                deploy_air_to_ground(bomber_x, bomber_y)    # We must be at a base, so bomb it
+                set_destination(100, 500)   # Make the bomber go home
         
-        if destination_reached() and bomber_x == kill_it[0][0] and bomber_y == kill_it[0][1]:
-            deploy_air_to_ground(kill_it[0][0], kill_it[0][1])
-            print("BOOM")
+        if len(kill_it) == 0:   # If the list of things to bomb is empty -> mission is complete!
             mission_complete()
-
-
-    ### STUFF BLOW HERE IS A WORK IN PROGRESS ###
-
-    # 
-    # kill_it = get_hit_coords(targets_to_hit)
-# 
-    # bomber_x = get_x_location()
-    # bomber_y = get_y_location()
-
-    # This statement is guaranteed to be entered once
-    # if bomb and taking_off():
-# 
-        #!FIXME
-        # print("Bomber taking off")
-        # set_destination(299, 500)
-
-    # This statement is guaranteed to be entered once
-    # if bomb and destination_reached():    # Initial "fake" destination
-    # 
-    # if bomb and len(kill_it) == 0:
-        # mission_complete()
     
 
 # This loads the simulation scenario
