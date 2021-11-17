@@ -95,10 +95,10 @@ def drone_recon():
         if x == 1600 and y == 200:
             set_destination(1600, 600)
         if x == 1600 and y == 600:
-            set_destination(300, 600)
-        if x == 300 and y == 600:
-            set_destination(300, 1000)
-        if x == 300 and y == 1000:
+            set_destination(400, 600)
+        if x == 400 and y == 600:
+            set_destination(400, 1000)
+        if x == 400 and y == 1000:
             set_destination(1600, 1000)
 
     if destination_reached() and (x == 1600 and y == 1000):
@@ -109,14 +109,13 @@ def drone_recon():
 
 ## Globals for Drone Bomber ##
 kill_it = list()
+base_to_hit = 0     # Keeps track of what index to "pop"
 
 def drone_bomber():
     # "deploy_air_to_ground(x, y)" is instantaneous
     #! Bomber has 100 pixel radius
 
-    global kill_it, targets_to_hit
-
-    kill_it = get_hit_coords(targets_to_hit)
+    global kill_it, targets_to_hit, base_to_hit
 
     bomber_x = get_x_location()
     bomber_y = get_y_location()
@@ -124,21 +123,27 @@ def drone_bomber():
     # Will only enter this part if the recon drone is done scanning
     if bomb:
 
-        if taking_off():    # Will enter one time -> on bomber drone's taking off
-            set_destination(100, 500)   # This is the bomber's "home"
-
         if destination_reached():   # If the bomber drone has gotten where it's supposed to go
+            print("base_to_hit:", base_to_hit)
+            kill_it = get_hit_coords(targets_to_hit)
+                
+            if base_to_hit < intel_report():    # Will continue as long as we don't hit an invalid index (since we start at 0, we're ok if base_to_hit < intel_report())
+            
+                if bomber_x < 300:  # If the drone is "safe"
+                    set_destination(100, 500)   # This is the bomber's "home"
+                
+                if bomber_x == 100 and bomber_y == 500:     # If the bomber is at "home"...
+                    base = kill_it.pop(base_to_hit)   # Pop the next base
+                    set_destination(base[0], base[1])   # Make its destination the first base's x and y
 
-            if bomber_x == 100 and bomber_y == 500:     # If the bomber is at "home"...
-                base = kill_it.pop(0)   # Pop the next base
-                set_destination(base[0], base[1])   # Make its destination the first base's x and y
+                if (bomber_x != 100 and bomber_y != 500) and (bomber_x > 300):     # If the bomber has reached its destination anywhere other than (100, 500)
+                    deploy_air_to_ground(bomber_x, bomber_y)    # We must be at a base, so bomb it
+                    base_to_hit += 1
+                    set_destination(100, 500)   # Make the bomber go home
 
-            if bomber_x != 100 and bomber_y != 500:     # If the bomber has reached its destination anywhere other than (100, 500)
-                deploy_air_to_ground(bomber_x, bomber_y)    # We must be at a base, so bomb it
-                set_destination(100, 500)   # Make the bomber go home
-        
-        if len(kill_it) == 0:   # If the list of things to bomb is empty -> mission is complete!
-            mission_complete()
+            else:
+                mission_complete()
+                
     
 
 # This loads the simulation scenario
