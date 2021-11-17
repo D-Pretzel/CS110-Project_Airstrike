@@ -134,7 +134,7 @@ def drone_bomber():
                 
                 if bomber_x == 100 and bomber_y == 500:     # If the bomber is at "home"...
                     base = kill_it.pop(base_to_hit)   # Pop the next base
-                    set_destination(base[0], base[1])   # Make its destination the first base's x and y
+                    set_destination((base[0] - 100), base[1])   # Make its destination the first base's x and y, just 100 pixels away for efficiency
 
                 if (bomber_x != 100 and bomber_y != 500) and (bomber_x > 300):     # If the bomber has reached its destination anywhere other than (100, 500)
                     deploy_air_to_ground(bomber_x, bomber_y)    # We must be at a base, so bomb it
