@@ -37,7 +37,8 @@ MAP_SEED = "three"
 # MAP_SEED = "test range"
 
 # 1-minimum scans, 2-minimum bomber dmg, 3-varying bomb damage, 4-Advanced SAMs, 5-limited bomb capacity
-# include desired mode numbers in list variable below
+
+#! Final turn-in: 1, 5?
 challenge_modes = []
 
 # == Initialize the global stuff == #
@@ -87,21 +88,33 @@ def drone_recon():
     ## DRONE MOVES ##
 
     if taking_off():
-        set_destination(300, 200)
+        set_destination(300, 500)
 
+    # If destination gets reached -> gets checked every frame
     if destination_reached():
-        if x == 300 and y == 200:
-            set_destination(1600, 200)
-        if x == 1600 and y == 200:
-            set_destination(1600, 600)
-        if x == 1600 and y == 600:
-            set_destination(400, 600)
-        if x == 400 and y == 600:
-            set_destination(400, 1000)
-        if x == 400 and y == 1000:
-            set_destination(1600, 1000)
+        if x == 300 and y == 500:   # Scan 1
+            data = get_scan_results()
+            set_destination(500, 500)
+        if x == 500 and y == 500:   # Scan 2
+            data = get_scan_results()
+            set_destination(875, 500)
+        if x == 875 and y == 500:   # Scan 3
+            data = get_scan_results()
+            set_destination(1250, 500)
+        if x == 1250 and y == 500:  # Scan 4
+            data = get_scan_results()
+            set_destination(1625, 500)
+        if x == 1625 and y == 500:  # Scan 5
+            data = get_scan_results()
+            set_destination(1625, 800)
+        if x == 1250 and y == 800:  # Scan 6
+            data = get_scan_results()
+            set_destination(875, 800)
+        if x == 875 and y == 500:  # Scan 7
+            data = get_scan_results()
+            set_destination(500, 800)
 
-    if destination_reached() and (x == 1600 and y == 1000):
+    if destination_reached() and (x == 500 and y == 800):   # When scan drone reaches (500, 800) commence bombing *insert 1812 overature here*
         bomb = True
 
     ## ============ ##
@@ -143,7 +156,7 @@ def drone_bomber():
 
             else:
                 mission_complete()
-                
+
     
 
 # This loads the simulation scenario
