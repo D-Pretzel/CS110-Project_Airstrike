@@ -44,7 +44,7 @@ challenge_modes = []
 # == Initialize the global stuff == #
 all_targets = list()
 targets_to_hit = list()
-bomb = bool()   # Trigger to tell bomber drone to go
+bomb = False   # Trigger to tell bomber drone to go
 # ================================= #
 
 # Returns 2D list containing all ordered pairs of targets to hit
@@ -67,14 +67,13 @@ def drone_recon():
     global targets_to_hit
     global bomb
     global kill_it
+    data = list()
 
     ignore_drone_damage()
     engage_plaidspeed()
 
     x = get_x_location()
     y = get_y_location()
-
-    data = get_scan_results()
 
     # Empty list checker
     if len(data) != 0: 
@@ -92,29 +91,31 @@ def drone_recon():
 
     # If destination gets reached -> gets checked every frame
     if destination_reached():
+        data = get_scan_results()
         if x == 300 and y == 500:   # Scan 1
-            data = get_scan_results()
+            
             set_destination(500, 500)
         if x == 500 and y == 500:   # Scan 2
-            data = get_scan_results()
+            
             set_destination(875, 500)
         if x == 875 and y == 500:   # Scan 3
-            data = get_scan_results()
+            
             set_destination(1250, 500)
         if x == 1250 and y == 500:  # Scan 4
-            data = get_scan_results()
+            
             set_destination(1625, 500)
         if x == 1625 and y == 500:  # Scan 5
-            data = get_scan_results()
+            
             set_destination(1625, 800)
         if x == 1250 and y == 800:  # Scan 6
-            data = get_scan_results()
+            
             set_destination(875, 800)
         if x == 875 and y == 500:  # Scan 7
-            data = get_scan_results()
+            
             set_destination(500, 800)
 
     if destination_reached() and (x == 500 and y == 800):   # When scan drone reaches (500, 800) commence bombing *insert 1812 overature here*
+        # = get_scan_results()
         bomb = True
 
     ## ============ ##
