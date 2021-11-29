@@ -138,7 +138,7 @@ def drone_recon():
 kill_it = list()
 base_to_hit = 0     # Keeps track of what index to "pop"
 
-'''
+
 def drone_bomber():
     # "deploy_air_to_ground(x, y)" is instantaneous
     #! Bomber has 100 pixel radius
@@ -172,7 +172,7 @@ def drone_bomber():
             else:
                 mission_complete()
     
-'''
+
 
 # This loads the simulation scenario
 # DO NOT TOUCH
