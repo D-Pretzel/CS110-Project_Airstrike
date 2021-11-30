@@ -45,6 +45,9 @@ challenge_modes = []
 all_targets = list()
 targets_to_hit = list()
 bomb = False   # Trigger to tell bomber drone to go
+frame = 0
+the_end = False
+kill_it = list()
 # ================================= #
 
 # Returns 2D list containing all ordered pairs of targets to hit
@@ -61,8 +64,7 @@ def get_hit_coords(targets):
     
     return(target_list)
 
-# Returns NOTHING -> simply puts data where it needs to go. Accepts 2D list as parameter
-def is_empty_scan(scan):
+def is_empty_scan(scan):    # Returns NOTHING -> simply puts data where it needs to go. Accepts 2D list as parameter
     global all_targets
     global targets_to_hit
     
@@ -73,12 +75,15 @@ def is_empty_scan(scan):
         if (row[0] == 'base'):     #! Change this line to change what the bomber drone bombs
             targets_to_hit.append(row)
 
-
 def drone_recon():
     global all_targets
     global targets_to_hit
     global bomb
     global kill_it
+    global frame
+    global the_end
+    
+    frame += 1
     data = list()
 
     ignore_drone_damage()
@@ -87,55 +92,39 @@ def drone_recon():
     x = get_x_location()
     y = get_y_location()
 
-    ## DRONE MOVES ##
+    if (frame % 5 == 0) and not the_end:
+        data = get_scan_results()
+        is_empty_scan(data)
 
+    ## DRONE MOVES ##
     if taking_off():
         set_destination(500, 300)
 
-    # If destination gets reached -> gets checked every frame
     if destination_reached() and (x == 500 and y == 300):
-        data = get_scan_results()
-        is_empty_scan(data)
         set_destination(500, 500)
-
+    
     if destination_reached() and (x == 500 and y == 500):
-        data = get_scan_results()
-        is_empty_scan(data)
         set_destination(875, 500)
 
     if destination_reached() and (x == 875 and y == 500):
-        data = get_scan_results()
-        is_empty_scan(data)
         set_destination(1250, 500)
 
     if destination_reached() and (x == 1250 and y == 500):
-        data = get_scan_results()
-        is_empty_scan(data)
         set_destination(1625, 500)
 
     if destination_reached() and (x == 1625 and y == 500):
-        data = get_scan_results()
-        is_empty_scan(data)
         set_destination(1625, 800)
 
     if destination_reached() and (x == 1625 and y == 800):
-        data = get_scan_results()
-        is_empty_scan(data)
         set_destination(875, 800)
 
     if destination_reached() and (x == 875 and y == 800):
-        data = get_scan_results()
-        is_empty_scan(data)
         set_destination(500, 800)
-
-    if destination_reached() and (x == 500 and y == 800):   # When scan drone reaches (500, 800) commence bombing *insert 1812 overature here*
+    
+    if destination_reached() and (x == 500 and y == 800):
         bomb = True
+        the_end = True
 
-    ## ============ ##
-
-
-## Globals for Drone Bomber ##
-kill_it = list()
 base_to_hit = 0     # Keeps track of what index to "pop"
 
 
