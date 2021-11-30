@@ -86,53 +86,48 @@ def drone_recon():
     frame += 1
     data = list()
 
-    ignore_drone_damage()
+    #ignore_drone_damage()
     engage_plaidspeed()
 
     x = get_x_location()
     y = get_y_location()
 
-    if (frame % 5 == 0) and not the_end:
+    if (frame % 6 == 0) and not the_end:
         data = get_scan_results()
         is_empty_scan(data)
 
     ## DRONE MOVES ##
     if taking_off():
-        set_destination(500, 300)
+        set_destination(500, 200)
 
-    if destination_reached() and (x == 500 and y == 300):
+    if destination_reached() and (x == 500 and y == 200):
+        set_destination(1675, 200)
+
+    if destination_reached() and (x == 1675 and y == 200):
+        set_destination(1600, 500)
+    
+    if destination_reached() and (x == 1600 and y == 500):
         set_destination(500, 500)
     
     if destination_reached() and (x == 500 and y == 500):
-        set_destination(875, 500)
-
-    if destination_reached() and (x == 875 and y == 500):
-        set_destination(1250, 500)
-
-    if destination_reached() and (x == 1250 and y == 500):
-        set_destination(1625, 500)
-
-    if destination_reached() and (x == 1625 and y == 500):
-        set_destination(1625, 800)
-
-    if destination_reached() and (x == 1625 and y == 800):
-        set_destination(875, 800)
-
-    if destination_reached() and (x == 875 and y == 800):
         set_destination(500, 800)
-    
+
     if destination_reached() and (x == 500 and y == 800):
+        set_destination(1675, 800)
+    
+    if destination_reached() and (x == 1675 and y == 800):
         bomb = True
         the_end = True
 
-base_to_hit = 0     # Keeps track of what index to "pop"
 
+base_to_hit = 0     # Keeps track of what index to "pop"
+back_to_base = 0    # Keeps track of when to send the bomber back to base
 
 def drone_bomber():
     # "deploy_air_to_ground(x, y)" is instantaneous
     #! Bomber has 100 pixel radius
 
-    global kill_it, targets_to_hit, base_to_hit
+    global kill_it, targets_to_hit, base_to_hit, back_to_base
 
     bomber_x = get_x_location()
     bomber_y = get_y_location()
@@ -140,13 +135,13 @@ def drone_bomber():
     # Will only enter this part if the recon drone is done scanning
     if bomb:
 
-        if destination_reached():   # If the bomber drone has gotten where it's supposed to go
-            print("base_to_hit:", base_to_hit)
+        if destination_reached():   # If the bomber drone has gotten where it's supposed to go 
             kill_it = get_hit_coords(targets_to_hit)
-                
+            back_to_base += 1
+
             if base_to_hit < intel_report():    # Will continue as long as we don't hit an invalid index (since we start at 0, we're ok if base_to_hit < intel_report())
             
-                if bomber_x < 300:  # If the drone is "safe"
+                if back_to_base % 2 == 0:  # If the drone has been out twice
                     set_destination(100, 500)   # This is the bomber's "home"
                 
                 if bomber_x == 100 and bomber_y == 500:     # If the bomber is at "home"...
@@ -160,8 +155,6 @@ def drone_bomber():
 
             else:
                 mission_complete()
-    
-
 
 # This loads the simulation scenario
 # DO NOT TOUCH
